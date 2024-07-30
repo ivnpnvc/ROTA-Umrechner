@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROTA-Umrechner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ROTA-Umrechner</h1>
+    <label for="inputValue">ROTA-Wert:</label>
+    <input type="number" id="inputValue" step="any" />
+    <button onclick="calculate()">Berechnen</button>
+    <p id="result"></p>
+
+    <script>
+        // Umwandlungstabelle als Array von Objekten
+        const conversionTable = [
+            { input: 33.3, output: 17.226 },
+            { input: 36.9, output: 21.507 },
+            { input: 40.7, output: 26.052 },
+            { input: 44.6, output: 30.678 },
+            { input: 50.4, output: 37.65 },
+            { input: 55.3, output: 44.849 },
+            { input: 60.7, output: 53.403 },
+            { input: 70.4, output: 68.429 },
+            { input: 80.9, output: 84.569 },
+            { input: 91.1, output: 100.73 },
+            { input: 101.3, output: 116.969 },
+            { input: 112.4, output: 134.235 },
+            { input: 123.8, output: 153.245 },
+            { input: 138, output: 171.759 },
+            { input: 170.4, output: 210.997 },
+            { input: 209.3, output: 250.267 }
+        ];
+
+        function calculate() {
+            const value = parseFloat(document.getElementById("inputValue").value);
+            if (isNaN(value)) {
+                document.getElementById("result").innerText = "Bitte geben Sie einen gueltigen Messwert ein.";
+                return;
+            }
+
+            // Suche nach dem nächstgelegenen Wert
+            let lowerBound = null;
+            let upperBound = null;
+
+            for (let i = 0; i < conversionTable.length; i++) {
+                if (conversionTable[i].input <= value) {
+                    lowerBound = conversionTable[i];
+                } else {
+                    upperBound = conversionTable[i];
+                    break;
+                }
+            }
+
+            if (lowerBound && upperBound) {
+                // Interpolation
+                const interpolatedValue = lowerBound.output + (upperBound.output - lowerBound.output) * (value - lowerBound.input) / (upperBound.input - lowerBound.input);
+                document.getElementById("result").innerText = `Der umgewandelte Wert fuer ${value} ist ungefaehr ${interpolatedValue.toFixed(2)}.`;
+            } else if (lowerBound) {
+                // Wert ist außerhalb des Bereichs
+                document.getElementById("result").innerText = `Der umgewandelte Wert fuer ${value} ist ungefaehr ${lowerBound.output.toFixed(2)}.`;
+            } else {
+                document.getElementById("result").innerText = `Der Wert ${value} liegt ausserhalb des unterstuetzten Bereichs.`;
+            }
+        }
+    </script>
+</body>
+</html>
